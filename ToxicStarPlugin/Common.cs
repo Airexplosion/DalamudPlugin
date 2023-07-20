@@ -1,3 +1,4 @@
+using Dalamud.Game.ClientState.Keys;
 using Dalamud.Hooking;
 using Dalamud.Logging;
 using System;
@@ -6,9 +7,10 @@ namespace ToxicStarPlugin
 {
     public partial class Plugin
     {
-        public delegate IntPtr RenderDelegate(IntPtr renderManager);
-        private Hook<RenderDelegate> renderDelegateHook;
-        private string signature = "E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38";
+        public delegate void MoveDelegate(IntPtr renderManager);
+        private Hook<MoveDelegate> _moveDelegate;
+        //Move Main
+        private string _signature = "E8 ?? ?? ?? ?? 44 0F 28 D8 E9 ?? ?? ?? ??";
         /// <summary>
         /// 打开设置界面
         /// </summary>
@@ -22,27 +24,26 @@ namespace ToxicStarPlugin
         private void OnOpen(string command, string args)
         {
             PluginLog.Information("OnOpen");
-            //useItem
-            var renderAddress = _sigScanner.ScanText(signature);
-            PluginLog.Information("renderAddress=" + renderAddress);
-
-            this.renderDelegateHook = Hook<RenderDelegate>.FromAddress(renderAddress, this.RenderDetour);
-            this.renderDelegateHook.Enable();
+            var renderAddress = _sigScanner.ScanText(_signature);
+            this._moveDelegate = Hook<MoveDelegate>.FromAddress(renderAddress, MoveExec);
+            this._moveDelegate.Enable();
         }
 
-        private unsafe IntPtr RenderDetour(IntPtr renderManager)
+        /// <summary>
+        /// 移动Hook执行函数
+        /// </summary>
+        /// <param name="renderManager"></param>
+        /// <returns></returns>
+        private void MoveExec(IntPtr renderManager)
         {
-            var res = this.renderDelegateHook.Original(renderManager);
-            PluginLog.Information("renderManager=" + renderManager);
-            PluginLog.Information("res=" + res);
-            PluginLog.Information("使用了道具");
-            return res;
+            //
+            _moveDelegate.Original(renderManager);
         }
 
         private void OnClose(string command, string args)
         {
             PluginLog.Information("OnClose");
-            this.renderDelegateHook.Dispose();
+            this._moveDelegate.Dispose();
         }
     }
 }
