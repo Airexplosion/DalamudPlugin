@@ -24,6 +24,7 @@ namespace ToxicStarPlugin
         private void OnOpen(string command, string args)
         {
             PluginLog.Information("OnOpen");
+            this._moveDelegate?.Dispose();
             var renderAddress = _sigScanner.ScanText(_signature);
             this._moveDelegate = Hook<MoveDelegate>.FromAddress(renderAddress, MoveExec);
             this._moveDelegate.Enable();
@@ -43,7 +44,7 @@ namespace ToxicStarPlugin
         private void OnClose(string command, string args)
         {
             PluginLog.Information("OnClose");
-            this._moveDelegate.Dispose();
+            this._moveDelegate?.Dispose();
         }
     }
 }

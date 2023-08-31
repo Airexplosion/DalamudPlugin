@@ -11,7 +11,7 @@ public class MainWindow : Window, IDisposable
 {
     private TextureWrap logoImg;
     private Plugin plugin;
-    public int Height;
+    public int Speed;
 
     public MainWindow() : base(
         "菜单", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
@@ -32,12 +32,12 @@ public class MainWindow : Window, IDisposable
 
         this.logoImg = logoImg;
         this.plugin = plugin;
-        this.Height = 0;
+        this.Speed = 0;
     }
 
     public override void Draw()
     {
-        ImGui.InputInt("高度", ref Height);
+        ImGui.InputInt("速度", ref Speed);
 
         ImGui.Spacing();
 
