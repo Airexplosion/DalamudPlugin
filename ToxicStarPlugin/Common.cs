@@ -7,7 +7,7 @@ namespace ToxicStarPlugin
 {
     public partial class Plugin
     {
-        public delegate void MoveDelegate(IntPtr renderManager);
+        public delegate IntPtr MoveDelegate(IntPtr renderManager);
         private Hook<MoveDelegate> _moveDelegate;
         //Move Main
         private string _signature = "E8 ?? ?? ?? ?? 44 0F 28 D8 E9 ?? ?? ?? ??";
@@ -35,10 +35,11 @@ namespace ToxicStarPlugin
         /// </summary>
         /// <param name="renderManager"></param>
         /// <returns></returns>
-        private void MoveExec(IntPtr renderManager)
+        private IntPtr MoveExec(IntPtr renderManager)
         {
-            //
-            _moveDelegate.Original(renderManager);
+            var  res = _moveDelegate.Original(renderManager);
+            res *= _mainWindow.Speed;
+            return res;
         }
 
         private void OnClose(string command, string args)
